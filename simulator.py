@@ -55,7 +55,6 @@ def RR_scheduling(process_list, time_quantum ):
     input_list = copy.deepcopy(process_list)
     schedule = []
     waiting_time = 0
-    ready_q = []
     wait_q = []
     N = len(input_list)
     current_process = None
@@ -66,10 +65,10 @@ def RR_scheduling(process_list, time_quantum ):
     while True:
 
         while (len(input_list) != 0 and input_list[0].arrive_time <= t):
-            ready_q.append(input_list.pop(0))
+            wait_q.append(input_list.pop(0))
 
         if current_process == None:
-            current_process = ready_q.pop(0)
+            current_process = wait_q.pop(0)
             schedule.append((t, current_process.id))
             t += 1
             continue
@@ -81,8 +80,6 @@ def RR_scheduling(process_list, time_quantum ):
         if(current_process.burst_time == 0):
             waiting_time += t - (current_process.arrive_time)
         elif q_t == time_quantum:
-            wait_q.extend(ready_q)
-            ready_q = []
             wait_q.append(current_process)
         else:
             t += 1
@@ -91,22 +88,15 @@ def RR_scheduling(process_list, time_quantum ):
         if(len(wait_q) != 0):
             if(current_process != wait_q[0]):
                 c_switch = True
-            wait_q.extend(ready_q)
-            ready_q = []
             current_process = wait_q.pop(0)
             q_t = 0
-        else:
-            if(len(input_list) == 0 and len(ready_q) == 0):
-                break
-            if(len(ready_q) != 0):
-                wait_q.extend(ready_q)
-                ready_q = []
-                current_process = wait_q.pop(0)
-            else:
-                current_process = input_list.pop(0)
-                t = current_process.arrive_time
+        elif (len(input_list) != 0):
+            current_process = input_list.pop(0)
+            t = current_process.arrive_time
             c_switch = True
             q_t = 0
+        else:
+            break
 
         if c_switch == True:
             schedule.append((t, current_process.id))
@@ -129,11 +119,13 @@ def SRTF_scheduling(process_list):
     while True:
 
         while (len(input_list) != 0 and input_list[0].arrive_time == t):
-            heapq.heappush(wait_q, (input_list[0].burst_time, input_list[0]))
+            wait_q.append((input_list[0].burst_time, input_list[0]))
             input_list.pop(0)
 
+        wait_q.sort(key= lambda tup: tup[0])
+
         if current_process == None:
-            current_process = heapq.heappop(wait_q)[1]
+            current_process = wait_q.pop(0)[1]
             schedule.append((t, current_process.id))
             t += 1
             continue
@@ -144,22 +136,25 @@ def SRTF_scheduling(process_list):
         if (current_process.burst_time == 0):
             waiting_time += (t - current_process.arrive_time)
         elif(len(wait_q) != 0 and current_process.burst_time > wait_q[0][0]):
-            heapq.heappush(wait_q, (current_process.burst_time, current_process))
+            wait_q.append((current_process.burst_time, current_process))
         else:
             t += 1
             continue
 
+        wait_q.sort(key= lambda tup: tup[0])
+
         if len(wait_q) != 0 :
-            current_process = heapq.heappop(wait_q)[1]
+            current_process = wait_q.pop(0)[1]
             c_switch = True
         else:
             if(len(input_list) == 0):
                 break
             t = input_list[0].arrive_time
             while (len(input_list) != 0 and input_list[0].arrive_time == t):
-                heapq.heappush(wait_q, (input_list[0].burst_time, input_list[0]))
+                wait_q.append((input_list[0].burst_time, input_list[0]))
                 input_list.pop(0)
-            current_process = heapq.heappop(wait_q)[1]
+            wait_q.sort(key= lambda tup: tup[0])
+            current_process = wait_q.pop(0)[1]
             c_switch = True
 
         if c_switch == True:
