@@ -230,17 +230,17 @@ def main(argv):
     print ("simulating RR ----")
     RR_schedule, RR_avg_waiting_time =  RR_scheduling(process_list,time_quantum = 2)
     write_output('RR.txt', RR_schedule, RR_avg_waiting_time )
-    '''for i in range(1, 11):
+    for i in range(1, 11):
         RR_schedule, RR_avg_waiting_time =  RR_scheduling(process_list,time_quantum = i)
-        print(RR_avg_waiting_time)'''
+        print("Time quantum = " + str(i) + "  Avg_wait_time = " + str(RR_avg_waiting_time))
     print ("simulating SRTF ----")
     SRTF_schedule, SRTF_avg_waiting_time =  SRTF_scheduling(process_list)
     write_output('SRTF.txt', SRTF_schedule, SRTF_avg_waiting_time )
     print ("simulating SJF ----")
     SJF_schedule, SJF_avg_waiting_time =  SJF_scheduling(process_list, alpha = 0.5)
     write_output('SJF.txt', SJF_schedule, SJF_avg_waiting_time )
-    '''for x in range(11):
+    for x in range(11):
         SJF_schedule, SJF_avg_waiting_time =  SJF_scheduling(process_list, alpha = (0.1 * x))
-        print(SJF_avg_waiting_time)'''
+        print("Alpha = %.1f"%(0.1 * x) + " Avg_wait_time =" + str(SJF_avg_waiting_time))
 if __name__ == '__main__':
     main(sys.argv[1:])
